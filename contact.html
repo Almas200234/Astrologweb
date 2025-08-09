@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AstroVibes - Contact</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="logo">🔮 AstroVibes</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="zodiac.html">Zodiac Signs</a>
+      <a href="horoscope.html">Horoscope</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <main class="content">
+    <h1>Contact Us</h1>
+    <p>Send a message to book a personalized reading.</p>
+    <form id="contactForm">
+      <input name="name" placeholder="Your name" required>
+      <input name="email" type="email" placeholder="Your email" required>
+      <input name="phone" placeholder="Phone (optional)">
+      <textarea name="message" rows="5" placeholder="Your message" required></textarea>
+      <button type="submit">Send Message</button>
+    </form>
+    <p id="form-status"></p>
+    <p style="font-size:0.9em;color:#ccc">Note: This demo sends data locally (downloads CSV). For cloud/email saving, follow README steps to integrate Google Apps Script.</p>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 AstroVibes</p>
+  </footer>
+
+  <script src="main.js"></script>
+  <script>
+  // Simple client-side CSV download (demo)
+  document.getElementById('contactForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    const form = e.target;
+    const data = new FormData(form);
+    const obj = {};
+    data.forEach((v,k)=> obj[k]=v);
+    const csv = Object.keys(obj).join(',') + '\\n' + Object.values(obj).map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',') + '\\n';
+    const blob = new Blob([csv], {type: 'text/csv'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'contact_'+Date.now()+'.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+    document.getElementById('form-status').textContent = 'Message saved locally (CSV downloaded).';
+    form.reset();
+  });
+  </script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AstroVibes - Horoscope</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="logo">🔮 AstroVibes</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="zodiac.html">Zodiac Signs</a>
+      <a href="horoscope.html">Horoscope</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <main class="content">
+    <h1>Today's Horoscope</h1>
+    <p>Select your zodiac sign below to fetch a real prediction (from Aztro API).</p>
+
+    <div class="sign-list">
+      <button class="api-sign">Aries</button>
+      <button class="api-sign">Taurus</button>
+      <button class="api-sign">Gemini</button>
+      <button class="api-sign">Cancer</button>
+      <button class="api-sign">Leo</button>
+      <button class="api-sign">Virgo</button>
+      <button class="api-sign">Libra</button>
+      <button class="api-sign">Scorpio</button>
+      <button class="api-sign">Sagittarius</button>
+      <button class="api-sign">Capricorn</button>
+      <button class="api-sign">Aquarius</button>
+      <button class="api-sign">Pisces</button>
+    </div>
+
+    <div id="prediction-box" class="prediction-box">
+      <h2 id="sign-name">Select a sign</h2>
+      <p id="prediction-text">Your prediction will appear here.</p>
+      <div id="meta"></div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 AstroVibes</p>
+  </footer>
+
+  <script src="main.js"></script>
+  <script>
+  // API-based fetching: Aztro (POST)
+  (function(){
+    const buttons = document.querySelectorAll('.api-sign');
+    const text = document.getElementById('prediction-text');
+    const signName = document.getElementById('sign-name');
+    const meta = document.getElementById('meta');
+
+    function showError(msg){
+      text.textContent = msg;
+      signName.textContent = 'Error';
+      meta.innerHTML = '';
+    }
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const sign = btn.textContent.toLowerCase();
+        signName.textContent = 'Loading...';
+        text.textContent = 'Fetching your horoscope... ✨';
+        meta.innerHTML = '';
+
+        // Aztro API endpoint
+        fetch('https://aztro.sameerkumar.website/?sign=' + sign + '&day=today', {
+          method: 'POST'
+        }).then(res => {
+          if(!res.ok) throw new Error('Network response not ok');
+          return res.json();
+        }).then(data => {
+          signName.textContent = btn.textContent;
+          text.textContent = data.description;
+          meta.innerHTML = '<p><strong>Lucky Number:</strong> ' + data.lucky_number + ' &nbsp; <strong>Color:</strong> ' + data.color + '</p>';
+        }).catch(err => {
+          console.error(err);
+          // fallback to local daily selection if API fails
+          const fallback = [
+            'A fresh energy arrives — take the first step.',
+            'A peaceful moment brings clarity.',
+            'Today is about connection; reach out to someone.',
+            'Opportunities arrive when you stay open-minded.',
+            'Focus on small wins; they add up.'
+          ];
+          signName.textContent = btn.textContent;
+          text.textContent = fallback[new Date().getDate() % fallback.length];
+          meta.innerHTML = '<p><em>Showing fallback prediction (offline mode)</em></p>';
+        });
+      });
+    });
+  })();
+  </script>
+</body>
+</html>
