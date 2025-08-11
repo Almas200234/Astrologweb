@@ -9,7 +9,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             try {
                 // Using AllOrigins to bypass CORS
-                const apiUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(`https://ohmanda.com/api/horoscope/${zodiac}/`)}`;
+               const apiUrl = `https://ohmanda.com/api/horoscope/${zodiac}/`;
+
                 const res = await fetch(apiUrl);
                 const data = await res.json();
                 const horoscopeData = JSON.parse(data.contents);
