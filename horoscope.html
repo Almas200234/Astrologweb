@@ -48,27 +48,49 @@
   </footer>
 
   <script src="main.js"></script>
- <script>
-document.querySelectorAll(".zodiac-buttons button").forEach(button => {
-    button.addEventListener("click", () => {
-        const signName = button.textContent.toLowerCase();
+<script>
+  // front-end: call the serverless proxy at /api/horoscope
+  const buttons = document.querySelectorAll('.api-sign, .zodiac-buttons button'); 
+  const text = document.getElementById('prediction-text') || document.querySelector('#prediction-box p');
+  const signName = document.getElementById('sign-name') || document.querySelector('#prediction-box h2');
+  const meta = document.getElementById('meta') || document.querySelector('#prediction-box .meta');
 
-        // Using CORS proxy for GitHub Pages
-        fetch(`https://api.allorigins.win/raw?url=https://aztro.sameerkumar.website/?sign=${signName}&day=today`, {
-            method: 'POST'
-        })
-        .then(response => response.json())
-        .then(data => {
-            predictionText.textContent = `${data.description}
-            
-Lucky Number: ${data.lucky_number}
-Lucky Color: ${data.color}`;
-        })
-        .catch(() => {
-            predictionText.textContent = "Sorry, could not fetch horoscope. Please try again.";
-        });
+  function showFallback(btn) {
+    const fallback = [
+      'A fresh energy arrives — take the first step.',
+      'A peaceful moment brings clarity.',
+      'Today is about connection; reach out to someone.',
+      'Opportunities arrive when you stay open-minded.',
+      'Focus on small wins; they add up.'
+    ];
+    signName.textContent = btn.textContent;
+    text.textContent = fallback[new Date().getDate() % fallback.length];
+    if(meta) meta.innerHTML = '<p><em>Showing fallback prediction (offline)</em></p>';
+  }
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const sign = btn.textContent.trim().toLowerCase();
+      signName.textContent = 'Loading...';
+      text.textContent = 'Fetching your horoscope... ✨';
+      if(meta) meta.innerHTML = '';
+
+      try {
+        const res = await fetch(`/api/horoscope?sign=${encodeURIComponent(sign)}&day=today`);
+        if (!res.ok) throw new Error('Network response not ok');
+        const data = await res.json();
+        signName.textContent = btn.textContent.trim();
+        text.textContent = data.description || 'No description returned.';
+        if (meta) {
+          meta.innerHTML = `<p><strong>Lucky Number:</strong> ${data.lucky_number || '-'} &nbsp; <strong>Color:</strong> ${data.color || '-'}</p>`;
+        }
+      } catch (err) {
+        console.error('fetch error', err);
+        showFallback(btn);
+      }
     });
-});
+  });
 </script>
+
 </body>
 </html>
