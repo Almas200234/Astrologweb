@@ -63,11 +63,23 @@ const localPredictions = {
 };
 
 async function getHoroscope(zodiac) {
-  // Pick a random local prediction
-  const fallbackList = localPredictions[zodiac.toLowerCase()] || ["Today is full of possibilities."];
-  const randomPrediction = fallbackList[Math.floor(Math.random() * fallbackList.length)];
-  
-  document.getElementById("prediction").innerText = randomPrediction;
+  const proxyUrl = "https://api.allorigins.win/raw?url=";
+  const targetUrl = `https://aztro.sameerkumar.website/?sign=${zodiac}&day=today`;
+
+  try {
+    const response = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
+      method: "POST"
+    });
+
+    if (!response.ok) throw new Error("API error");
+
+    const data = await response.json();
+    document.getElementById("prediction").innerText = data.description;
+  } catch (error) {
+    console.error("Error fetching horoscope:", error.message);
+    document.getElementById("prediction").innerText = "Unable to load prediction.";
+  }
 }
+
 
 // Example usage: getHoroscope("cancer");
