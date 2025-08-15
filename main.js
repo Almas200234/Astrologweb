@@ -63,26 +63,11 @@ const localPredictions = {
 };
 
 async function getHoroscope(zodiac) {
-  const apiUrl = `https://aztro.sameerkumar.website/?sign=${zodiac}&day=today`;
-
-  try {
-    const response = await fetch(apiUrl, {
-      method: 'POST'
-    });
-    if (!response.ok) throw new Error("API error");
-
-    const data = await response.json();
-    if (data && data.description) {
-      document.getElementById("prediction").innerText = data.description;
-    } else {
-      throw new Error("No data");
-    }
-  } catch (error) {
-    console.warn("API failed, using local prediction:", error.message);
-    const fallbackList = localPredictions[zodiac.toLowerCase()] || ["Today is full of possibilities."];
-    const randomPrediction = fallbackList[Math.floor(Math.random() * fallbackList.length)];
-    document.getElementById("prediction").innerText = randomPrediction;
-  }
+  // Pick a random local prediction
+  const fallbackList = localPredictions[zodiac.toLowerCase()] || ["Today is full of possibilities."];
+  const randomPrediction = fallbackList[Math.floor(Math.random() * fallbackList.length)];
+  
+  document.getElementById("prediction").innerText = randomPrediction;
 }
 
 // Example usage: getHoroscope("cancer");
