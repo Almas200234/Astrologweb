@@ -62,6 +62,7 @@ const localPredictions = {
   ]
 };
 
+// New getHoroscope function with proxy + fallback
 async function getHoroscope(zodiac) {
   const proxyUrl = "https://api.allorigins.win/raw?url=";
   const targetUrl = `https://aztro.sameerkumar.website/?sign=${zodiac}&day=today`;
@@ -74,12 +75,18 @@ async function getHoroscope(zodiac) {
     if (!response.ok) throw new Error("API error");
 
     const data = await response.json();
-    document.getElementById("prediction").innerText = data.description;
+
+    if (data && data.description) {
+      document.getElementById("prediction").innerText = data.description;
+    } else {
+      throw new Error("No data received");
+    }
   } catch (error) {
-    console.error("Error fetching horoscope:", error.message);
-    document.getElementById("prediction").innerText = "Unable to load prediction.";
+    console.warn("API failed, using local prediction:", error.message);
+
+    // fallback to local predictions
+    const fallbackList = localPredictions[zodiac.toLowerCase()] || ["Today is full of possibilities."];
+    const randomPrediction = fallbackList[Math.floor(Math.random() * fallbackList.length)];
+    document.getElementById("prediction").innerText = randomPrediction;
   }
 }
-
-
-// Example usage: getHoroscope("cancer");
